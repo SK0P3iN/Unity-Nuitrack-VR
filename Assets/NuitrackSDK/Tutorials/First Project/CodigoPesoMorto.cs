@@ -29,11 +29,11 @@ public class CodigoPesoMorto : MonoBehaviour
 
     const float scalK = 0.01f;
     private bool isPosicaoInicialGuardada = false, isAgachado = false;
-    Vector3[] coordenadasJoints = new Vector3[8];
+    Vector3[] coordenadasJoints = new Vector3[9];
     public Text timerMensagem, contadorRepeticoes;
     private float timerComecar = 5f;
     
-    Vector3[] posInicial_Y = new Vector3[8];
+    Vector3[] posInicial_Y = new Vector3[9];
     
 
 
@@ -74,9 +74,9 @@ public class CodigoPesoMorto : MonoBehaviour
             coordenadasJoints[2] = scalK * skeleton.GetJoint(nuitrack.JointType.RightShoulder).ToVector3(); //ombro direito
             coordenadasJoints[3] = scalK * skeleton.GetJoint(nuitrack.JointType.LeftShoulder).ToVector3(); //ombro esquerdo
             coordenadasJoints[4] = scalK * skeleton.GetJoint(nuitrack.JointType.Torso).ToVector3(); //torso
-            coordenadasJoints[5] = scalK * skeleton.GetJoint(nuitrack.JointType.LeftElbow).ToVector3(); //braco direito
+
+            coordenadasJoints[5] = scalK * skeleton.GetJoint(nuitrack.JointType.RightElbow).ToVector3(); //braco direito
             coordenadasJoints[6] = scalK * skeleton.GetJoint(nuitrack.JointType.LeftElbow).ToVector3(); //braco esquerdo
-           
             coordenadasJoints[7] = scalK * skeleton.GetJoint(nuitrack.JointType.RightKnee).ToVector3(); //joelho direito
             coordenadasJoints[8] = scalK * skeleton.GetJoint(nuitrack.JointType.LeftKnee).ToVector3(); //joelho esquerdo
 
@@ -155,21 +155,21 @@ public class CodigoPesoMorto : MonoBehaviour
     private void ContaAgachamento(Vector3[] coordenadasJoints)
     {
         //calcula se voltou as unidades iniciais
-        for(int i=0; i<6;i++){
+        for(int i=0; i<4;i++){
             float posDeltaY = posInicial_Y[i].y - coordenadasJoints[i].y;
             float posDeltaZ = posInicial_Y[i].z - coordenadasJoints[i].z;
             
-            if(posDeltaY > 0.5f && posDeltaZ > 0.5f)
+            if(posDeltaY > 1.0f && posDeltaZ > 1.0f)
                 return;
         }
 
-        if(trocouPerna)
+        /*if(trocouPerna)
         {
             if(posInicial_Y[8].y - coordenadasJoints[8].y > 1.0f && posInicial_Y[8].z - coordenadasJoints[8].z > 1.0f) return; //mexeu a perna esquerda nao conta
         }
         else{
             if(posInicial_Y[7].y - coordenadasJoints[7].y > 1.0f && posInicial_Y[7].z - coordenadasJoints[7].z > 1.0f) return; //mexeu a perna direita nao conta
-        }
+        }*/
         
         isAgachado = false;
         repeticoes--;
@@ -178,7 +178,7 @@ public class CodigoPesoMorto : MonoBehaviour
     private void VerificaRepeticao(Vector3[] coordenadasJoints)
     {
         //verifica se desceu as unidades necessárias no y e no z
-        for(int i=0; i<6;i++){
+        /*for(int i=0; i<6;i++){
             float posDeltaY = posInicial_Y[i].y - coordenadasJoints[i].y;
             float posDeltaZ = posInicial_Y[i].z - coordenadasJoints[i].z;
             
@@ -192,9 +192,59 @@ public class CodigoPesoMorto : MonoBehaviour
         }
         else{
             if(posInicial_Y[7].y - coordenadasJoints[7].y > 1.0f && posInicial_Y[7].z - coordenadasJoints[7].z > 1.0f) return; //mexeu a perna direita nao conta
+        }*/
+
+        float deltaCabeca_Y = posInicial_Y[0].y - coordenadasJoints[0].y;
+        float deltaCabeca_Z = posInicial_Y[0].z - coordenadasJoints[0].z;
+
+        float deltaPescoco_Y = posInicial_Y[1].y - coordenadasJoints[1].y;
+        float deltaPescoco_Z = posInicial_Y[1].z - coordenadasJoints[1].z;
+
+        float deltaOmbDireito_Y = posInicial_Y[2].y - coordenadasJoints[2].y;
+        float deltaOmbDireito_Z = posInicial_Y[2].z - coordenadasJoints[2].z;
+
+        float deltaOmbEsquerdo_Y = posInicial_Y[3].y - coordenadasJoints[3].y;
+        float deltaOmbEsquerdo_Z = posInicial_Y[3].z - coordenadasJoints[3].z;
+
+        float deltaTorso_Y = posInicial_Y[4].y - coordenadasJoints[4].y;
+        float deltaTorso_Z = posInicial_Y[4].z - coordenadasJoints[4].z;
+
+        float deltabracoDireito_Y = posInicial_Y[5].y - coordenadasJoints[5].y;
+
+        float deltabracoEsquerdo_Y = posInicial_Y[6].y - coordenadasJoints[6].y;
+
+        /*print("DELTA_CAB: " + deltaCabeca_Y.ToString() + ", " + deltaCabeca_Z.ToString());
+        print("DELTA_PESC: " + deltaPescoco_Y.ToString() + ", " + deltaPescoco_Z.ToString());
+        print("DELTA_ombroD: " + deltaOmbDireito_Y.ToString() + ", " + deltaOmbDireito_Z.ToString());
+        print("DELTA_ombroE: " + deltaOmbEsquerdo_Y.ToString() + ", " + deltaOmbEsquerdo_Z.ToString());
+        print("DELTA_TORSO: " + deltaTorso_Y.ToString() + ", " + deltaTorso_Z.ToString());
+
+        print("DELTA_bacoD: " + deltabracoDireito_Y.ToString());
+        print("DELTA_bracoE: " + deltabracoEsquerdo_Y.ToString());*/
+
+        if(deltaCabeca_Y < 3.5f || deltaPescoco_Y < 2.5f || deltaOmbDireito_Y < 2.0f || deltaOmbEsquerdo_Y < 2.0f || deltaTorso_Y <2.0f)
+            return;
+
+        if(deltaCabeca_Z < 4.5f || deltaPescoco_Z < 3.5f || deltaOmbDireito_Z < 3.0f || deltaOmbEsquerdo_Z < 3.0f || deltaTorso_Z <1.5f)
+            return;
+
+        if(trocouPerna){
+            if(deltabracoDireito_Y > deltabracoEsquerdo_Y){
+                    print("braco errado, baixo o direito");
+                    return;
+            }
+                
+
+        }else{
+            if(deltabracoEsquerdo_Y > deltabracoDireito_Y){
+                print("braco errado, baixa o esquerdo");
+                return;
+            }
+                
+                
         }
 
-        
+
         isAgachado = true;
     }
 
